@@ -3,7 +3,7 @@
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-00a393)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.25%2B-FF4B4B)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-1.3%2B-F7931E)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-1.3%2B-F7931E) 
 
 ## 📌 Project Overview
 This project is a complete, production-ready Machine Learning Micro-SaaS designed for the mobile gaming industry. It predicts whether a newly acquired player will churn (abandon the game) or stay loyal, based solely on their **Day-0 behavior**. 
