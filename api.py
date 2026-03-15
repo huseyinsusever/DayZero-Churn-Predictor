@@ -1,9 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import pandas as pd
 import pickle
 import sqlite3
 from datetime import datetime
+import time
 
 # --- DATABASE LOGIC ---
 def init_db():
@@ -15,61 +16,84 @@ def init_db():
             timestamp DATETIME,
             session_count INTEGER,
             login_days INTEGER,
-            churn_prob REAL
+            churn_prob REAL,
+            process_time REAL
         )
     ''')
     conn.commit()
     conn.close()
 
-def save_prediction(session_count, login_days, prediction):
+def save_prediction(session_count, login_days, prediction, process_time):
     conn = sqlite3.connect('predictions.db')
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO churn_logs (timestamp, session_count, login_days, churn_prob)
-        VALUES (?, ?, ?, ?)
-    ''', (datetime.now(), session_count, login_days, float(prediction)))
+        INSERT INTO churn_logs (timestamp, session_count, login_days, churn_prob, process_time)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (datetime.now(), session_count, login_days, float(prediction), process_time))
     conn.commit()
     conn.close()
 
-# API başladığında veritabanını hazırla
 init_db()
 
-# --- APP INITIALIZATION ---
-app = FastAPI(title="Game Player Churn Prediction API", version="1.0")
+# --- APP BRANDING ---
+app = FastAPI(
+    title="Day-0 Player Churn Predictor",
+    description="""
+    Predicts mobile game player churn probability based on Day-0 behavior. 
+    Built for high-performance gaming analytics.
+    
+    ### 🛠 Tech Stack:
+    * **Backend**: FastAPI
+    * **ML Model**: Scikit-Learn (Logistic Regression)
+    * **Database**: SQLite (Real-time logging)
+    """,
+    version="2.0.0",
+    contact={
+        "name": "Hüseyin Susever",
+        "url": "https://github.com/hsusever",
+    }
+)
 
-# Model dosyasını yükle
+# --- MODEL LOADING ---
 try:
     with open('churn_model.pkl', 'rb') as file:
         model = pickle.load(file)
-    print("Model loaded successfully!")
 except FileNotFoundError:
-    print("Error: Could not find 'churn_model.pkl'.")
+    model = None
 
 # --- DATA STRUCTURE ---
 class PlayerData(BaseModel):
     day_0_sessions: int
     install_day_of_week: int
 
-# --- ENDPOINTS ---
+# --- ENDPOINT ---
 @app.post("/predict")
-def predict_churn(player: PlayerData):
-    # Step A: Convert JSON to DataFrame
-    input_df = pd.DataFrame([{
-        'day_0_sessions': player.day_0_sessions,
-        'install_day_of_week': player.install_day_of_week
-    }])
+async def predict_churn(player: PlayerData):
+    start_time = time.time() # Performans ölçümü başlasın
     
-    # Step B: Get prediction (0 or 1)
-    prediction = model.predict(input_df)
-    result = int(prediction[0])
-    
-    # Step C: VERİTABANINA KAYDETME (Mülakatta şov yapacağımız yer)
-    # Modelin 'predict_proba' desteği varsa olasılık skorunu, yoksa 0/1 sonucunu kaydederiz
-    save_prediction(player.day_0_sessions, player.install_day_of_week, result)
-    
-    # Step D: Return results
-    return {
-        "status": "success",
-        "prediction": result,
-        "message": "This player is likely to CHURN (leave the game)." if result == 1 else "This player is likely to STAY."
-    }
+    if model is None:
+        raise HTTPException(status_code=500, detail="Model file missing.")
+
+    try:
+        input_df = pd.DataFrame([{
+            'day_0_sessions': player.day_0_sessions,
+            'install_day_of_week': player.install_day_of_week
+        }])
+        
+        prediction = model.predict(input_df)
+        result = int(prediction[0])
+        
+        # Yanıt süresini hesapla
+        duration = time.time() - start_time
+        
+        # Veritabanına hem tahmini hem de hızı kaydet
+        save_prediction(player.day_0_sessions, player.install_day_of_week, result, duration)
+        
+        return {
+            "status": "success",
+            "prediction": result,
+            "latency_sec": round(duration, 4),
+            "message": "Player likely to CHURN" if result == 1 else "Player likely to STAY"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))py api.py
