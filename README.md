@@ -1,43 +1,61 @@
-# DayZero Churn Predictor 🚀
+🎮 Mobile Game Player Churn Predictor (End-to-End MLOps)
+This project is a production-ready Machine Learning API designed to predict player retention for mobile games. It doesn't just make predictions; it collects data, monitors performance, and retrains itself.
 
-[![RapidAPI](https://img.shields.io/badge/RapidAPI-Live_Demo-blue?style=for-the-badge&logo=rapidapi)](https://rapidapi.com/hsusever/api/dayzero-churn-predictor)
+🚀 Key Features
+Real-time Prediction: FastAPI backend providing instant churn probability.
 
-This project predicts mobile game player churn...
+Data Persistence (SQL): Every API request and prediction is logged into a SQLite database for auditing and future training.
 
-## 🚀 How to Use the API
+Automated Retraining: A dedicated retrain.py pipeline that updates the model using newly collected real-world data.
 
-You can test the model live via **RapidAPI**. 
+Performance Monitoring: Tracks API latency (ms) for every request to ensure high-speed delivery.
 
-1. Visit the [Live Demo](https://rapidapi.com/hsusever/api/dayzero-churn-predictor).
-2. Go to the **Endpoints** tab.
-3. Use the `Predict Churn` endpoint with a JSON payload:
-   ```json
-   {
-     "session_count": 5,
-     "login_days": 1
-   }
-# 🎮 Game Player Churn Prediction: End-to-End ML Pipeline
+Business Intelligence: Includes advanced SQL scripts for player segmentation and behavioral analysis.
 
-![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-00a393)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.25%2B-FF4B4B)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-1.3%2B-F7931E) 
+🛠 Tech Stack
+Language: Python 3.10+
 
-## 📌 Project Overview
-This project is a complete, production-ready Machine Learning Micro-SaaS designed for the mobile gaming industry. It predicts whether a newly acquired player will churn (abandon the game) or stay loyal, based solely on their **Day-0 behavior**. 
+Framework: FastAPI (Backend) & Pydantic (Validation)
 
-Instead of just presenting a Jupyter Notebook, this project demonstrates a full engineering lifecycle: data processing, addressing highly imbalanced datasets, exposing the model via a RESTful API, and providing an interactive web interface for product managers.
+Machine Learning: Scikit-Learn (Logistic Regression)
 
-## 🏗️ Architecture & Tech Stack
-The project is built on a modern AI deployment architecture:
-1. **Brain (Machine Learning):** `scikit-learn` & `pandas`. A Logistic Regression model trained with `class_weight='balanced'` to capture the rare positive class (retained users) in a highly skewed mobile game dataset (99.8% churn rate).
-2. **Backend Engine (REST API):** `FastAPI` & `Uvicorn`. Serves the serialized model (`.pkl`) to the web, responding to real-time JSON payloads in milliseconds.
-3. **Frontend UI (Micro-SaaS):** `Streamlit`. A clean, interactive web dashboard allowing non-technical stakeholders to input user metrics and receive immediate AI predictions.
+Database: SQLite (SQL Logging)
 
-## 📂 Project Structure
-```text
-📦 player-churn-predictor
- ┣ 📜 api.py              # The FastAPI backend server
- ┣ 📜 app.py              # The Streamlit frontend web application
- ┣ 📜 churn_model.pkl     # The serialized Machine Learning model
- ┣ 📜 README.md           # Project documentation
+Deployment: Render & RapidAPI
+
+📂 Project Structure
+api.py: The heart of the system. Handles requests and logs data to SQL.
+
+retrain.py: The MLOps pipeline to refresh the model with new data.
+
+business_analysis.sql: Complex SQL queries for data-driven decision making.
+
+churn_model.pkl: The brain (Serialized ML model).
+
+requirements.txt: Necessary libraries for cloud deployment.
+
+📈 Advanced Analytics (SQL)
+The system includes a business_analysis.sql file designed for Product Managers to identify "High-Value Players at Risk." It uses:
+
+Window Functions (AVG OVER PARTITION)
+
+CTEs for clean, readable analysis.
+
+Aggregations to track daily churn trends.
+
+⚙️ How to Run Locally
+Install dependencies:
+
+Bash
+pip install -r requirements.txt
+Start the API:
+
+Bash
+uvicorn api:app --reload
+Retrain the model:
+
+Bash
+python retrain.py
+Author: Hüseyin Susever
+
+Focused on Data Science & Machine Learning Engineering.
