@@ -1,3 +1,21 @@
+# DayZero Churn Predictor 🚀
+
+[![RapidAPI](https://img.shields.io/badge/RapidAPI-Live_Demo-blue?style=for-the-badge&logo=rapidapi)](https://rapidapi.com/hsusever/api/dayzero-churn-predictor)
+
+This project predicts mobile game player churn...
+
+## 🚀 How to Use the API
+
+You can test the model live via **RapidAPI**. 
+
+1. Visit the [Live Demo](https://rapidapi.com/hsusever/api/dayzero-churn-predictor).
+2. Go to the **Endpoints** tab.
+3. Use the `Predict Churn` endpoint with a JSON payload:
+   ```json
+   {
+     "session_count": 5,
+     "login_days": 1
+   }
 # 🎮 Game Player Churn Prediction: End-to-End ML Pipeline
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
